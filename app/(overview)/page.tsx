@@ -19,9 +19,9 @@ export default async function Page() {
       <h1 className={`text-center text-9xl ${bitcount.className}`}>
         Welcome to Tech Haven
       </h1>
-      <h2>Daily Products</h2>
+      <h2 className="text-center text-6xl">Daily Products</h2>
       <ProductCarousel content={dailyProducts} />
-      <h2>Top Selling</h2>
+      <h2 className="text-center text-6xl">Top Selling</h2>
       <ProductCarousel content={mostPurchased} />
     </main>
   );
