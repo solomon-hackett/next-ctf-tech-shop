@@ -1,6 +1,6 @@
-import { Bitcount_Grid_Double_Ink, Oswald, Inter } from "next/font/google";
+import { Bitcount, Oswald, Inter } from "next/font/google";
 
-export const bitcount = Bitcount_Grid_Double_Ink({
+export const bitcount = Bitcount({
   subsets: ["latin"],
   weight: ["500"],
   variable: "--font-bitcount",
