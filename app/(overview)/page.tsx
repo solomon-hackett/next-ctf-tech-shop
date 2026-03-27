@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function Page() {
   return (
     <main>
-      <h1 className={`text-center text-9xl ${bitcount.className}`}>
+      <h1 className={`mt-30 text-center text-9xl ${bitcount.className}`}>
         Welcome to Tech Haven
       </h1>
       <Suspense fallback={<CarouselSkeleton />}>

@@ -19,15 +19,10 @@ export default function ProductCarousel({
   const GAP = 20;
   const STRIDE = CARD_WIDTH + GAP;
   const COUNT = content.length;
-
-  // We render: [clones of last N] + [real items] + [clones of first N]
-  // CLONE_COUNT controls how many items are cloned on each side.
-  // We clone all items so the "seam" is never visible.
-  const items = [...content, ...content, ...content]; // prev-clone | real | next-clone
+  const items = [...content, ...content, ...content];
 
   const getRealIndex = useCallback(
     (scrollLeft: number) => {
-      // The real items start at index COUNT (after one full set of clones)
       const offset = scrollLeft - COUNT * STRIDE;
       const raw = Math.round(offset / STRIDE);
       return ((raw % COUNT) + COUNT) % COUNT;
@@ -35,14 +30,11 @@ export default function ProductCarousel({
     [COUNT, STRIDE],
   );
 
-  // On mount, jump to the real first item (the middle clone group)
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
-    // Silence scroll listener during the initial jump
     isJumping.current = true;
     el.scrollLeft = COUNT * STRIDE;
-    // Small timeout to let layout settle
     requestAnimationFrame(() => {
       isJumping.current = false;
     });
@@ -55,19 +47,15 @@ export default function ProductCarousel({
     const scrollLeft = el.scrollLeft;
     const totalWidth = COUNT * STRIDE;
 
-    // Update active dot
     setActiveIndex(getRealIndex(scrollLeft));
 
-    // Boundary detection: jumped past the last clone group → wrap to real start
     if (scrollLeft >= totalWidth * 2) {
       isJumping.current = true;
       el.scrollLeft = scrollLeft - totalWidth;
       requestAnimationFrame(() => {
         isJumping.current = false;
       });
-    }
-    // Jumped before the first clone group → wrap to real end
-    else if (scrollLeft <= 0) {
+    } else if (scrollLeft <= 0) {
       isJumping.current = true;
       el.scrollLeft = scrollLeft + totalWidth;
       requestAnimationFrame(() => {
@@ -95,14 +83,12 @@ export default function ProductCarousel({
   const scrollToRealIndex = (targetIndex: number) => {
     const el = trackRef.current;
     if (!el) return;
-    // Find the real item position (middle clone group)
     const targetScroll = COUNT * STRIDE + targetIndex * STRIDE;
     el.scrollTo({ left: targetScroll, behavior: "smooth" });
   };
 
   return (
     <section className="relative mx-auto w-full max-w-6xl px-4 py-8">
-      {/* Header row */}
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-4xl font-bold tracking-tight text-gray-900">
           {title}
@@ -140,16 +126,11 @@ export default function ProductCarousel({
           </button>
         </div>
       </div>
-
-      {/* Scroll track */}
       <div
         ref={trackRef}
         className="flex gap-5 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        // Note: we intentionally omit scroll-smooth here so the jump teleport is instant.
-        // smooth scrolling for nav buttons is handled via el.scrollBy({ behavior: "smooth" })
       >
         {items.map((product, index) => {
-          // Determine real index for this rendered clone
           const realIdx = index % COUNT;
           return (
             <article
@@ -158,20 +139,17 @@ export default function ProductCarousel({
               className="group relative flex shrink-0 flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-xl"
               style={{ width: CARD_WIDTH, minWidth: CARD_WIDTH }}
             >
-              {/* Image area */}
               <div className="relative aspect-square w-full overflow-hidden bg-gray-50">
                 <Image
                   src={product.image}
                   alt={product.name}
                   fill
+                  sizes={`${CARD_WIDTH}px`}
                   className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
                   priority={realIdx < 3}
-                  placeholder="blur"
-                  blurDataURL="/images/placeholder.png"
                 />
               </div>
 
-              {/* Card body */}
               <div className="flex flex-col gap-1 p-4 pt-3">
                 <span className="text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
                   {product.category}
@@ -202,7 +180,7 @@ export default function ProductCarousel({
                     </svg>
                   </Link>
                   <Link
-                    href={`/shop/purchase/${product.id}`}
+                    href={`/checkout/${product.id}`}
                     className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-gray-700"
                   >
                     Buy Now
@@ -214,7 +192,6 @@ export default function ProductCarousel({
         })}
       </div>
 
-      {/* Dot indicators — always COUNT dots, always one active */}
       {COUNT > 1 && (
         <div className="mt-4 flex justify-center gap-1.5">
           {content.map((_, i) => (
