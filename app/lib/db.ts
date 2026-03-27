@@ -15,7 +15,6 @@ type ExecuteQueryParams = {
   values?: (string | number | boolean | null)[];
 };
 
-// Make it generic <T> so TS knows what type results are
 export default async function executeQuery<T>({
   query,
   values = [],

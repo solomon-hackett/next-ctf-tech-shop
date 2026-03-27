@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { bitcount } from "@/app/ui/fonts";
-import { fetchDailyProducts, fetchMostPurchased } from "@/app/lib/data";
-import Link from "next/link";
-import type { Product } from "@/app/lib/definitions";
-import ProductCarousel from "@/app/ui/home/product-carousel";
+import { Suspense } from "react";
+import { CarouselSkeleton } from "@/app/ui/skeletons";
+import DailyProducts from "@/app/ui/home/daily-products";
+import TopSelling from "@/app/ui/home/top-selling";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -11,18 +11,17 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const dailyProducts: Product[] = await fetchDailyProducts();
-  const mostPurchased: Product[] = await fetchMostPurchased();
-
   return (
     <main>
       <h1 className={`text-center text-9xl ${bitcount.className}`}>
         Welcome to Tech Haven
       </h1>
-      <h2 className="text-center text-6xl">Daily Products</h2>
-      <ProductCarousel content={dailyProducts} />
-      <h2 className="text-center text-6xl">Top Selling</h2>
-      <ProductCarousel content={mostPurchased} />
+      <Suspense fallback={<CarouselSkeleton />}>
+        <DailyProducts />
+      </Suspense>
+      <Suspense fallback={<CarouselSkeleton />}>
+        <TopSelling />
+      </Suspense>
     </main>
   );
 }
