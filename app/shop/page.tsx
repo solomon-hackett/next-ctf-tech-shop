@@ -13,14 +13,16 @@ export const metadata: Metadata = {
 export default async function Page(props: {
   searchParams?: Promise<{
     query?: string;
-    page?: string;
     sort?: string;
+    category?: string;
+    page?: string;
   }>;
 }) {
   const searchParams = await props.searchParams;
   const query = searchParams?.query || "";
-  const currentPage = Number(searchParams?.page) || 1;
   const sort = searchParams?.sort || "";
+  const category = searchParams?.category || "";
+  const currentPage = Number(searchParams?.page) || 1;
   return (
     <main>
       <h1 className={`mt-30 text-center text-9xl ${bitcount.className}`}>
@@ -31,7 +33,12 @@ export default async function Page(props: {
         key={query + currentPage + sort}
         fallback={<ProductGridSkeleton />}
       >
-        <ProductGrid query={query} currentPage={currentPage} sort={sort} />
+        <ProductGrid
+          query={query}
+          sort={sort}
+          category={category}
+          currentPage={currentPage}
+        />
       </Suspense>
     </main>
   );
