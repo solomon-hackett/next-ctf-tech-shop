@@ -1,5 +1,5 @@
 "use client";
-import type { Product } from "@/app/lib/definitions";
+import type { DisplayProduct } from "@/app/lib/definitions";
 import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState, useEffect, useCallback } from "react";
@@ -8,7 +8,7 @@ export default function ProductCarousel({
   content,
   title,
 }: {
-  content: Product[];
+  content: DisplayProduct[];
   title: string;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -126,70 +126,95 @@ export default function ProductCarousel({
           </button>
         </div>
       </div>
-      <div
-        ref={trackRef}
-        className="flex gap-5 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {items.map((product, index) => {
-          const realIdx = index % COUNT;
-          return (
-            <article
-              key={`${product.id}-${index}`}
-              data-card
-              className="group relative flex shrink-0 flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-xl"
-              style={{ width: CARD_WIDTH, minWidth: CARD_WIDTH }}
-            >
-              <div className="relative aspect-square w-full overflow-hidden bg-gray-50">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  sizes={`${CARD_WIDTH}px`}
-                  className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-                  priority={realIdx < 3}
-                />
-              </div>
 
-              <div className="flex flex-col gap-1 p-4 pt-3">
-                <span className="text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
-                  {product.category}
-                </span>
-                <h3 className="line-clamp-2 text-sm leading-snug font-semibold text-gray-900">
-                  {product.name}
-                </h3>
-                <div className="mt-3 flex items-center justify-between">
-                  <Link
-                    href={`/shop/${product.id}`}
-                    className="group/link flex items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-gray-900"
-                  >
-                    View details
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 12 12"
-                      fill="none"
-                      className="transition-transform duration-200 group-hover/link:translate-x-0.5"
-                    >
-                      <path
-                        d="M2.5 6h7M6.5 3l3 3-3 3"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </Link>
-                  <Link
-                    href={`/checkout/${product.id}`}
-                    className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-gray-700"
-                  >
-                    Buy Now
-                  </Link>
+      <div className="relative">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute top-0 left-0 z-10 h-full w-16 bg-linear-to-r from-white to-transparent"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute top-0 right-0 z-10 h-full w-16 bg-linear-to-l from-white to-transparent"
+        />
+
+        <div
+          ref={trackRef}
+          className="flex gap-5 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {items.map((product, index) => {
+            const realIdx = index % COUNT;
+            return (
+              <article
+                key={`${product.id}-${index}`}
+                data-card
+                className="group relative flex shrink-0 flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-xl"
+                style={{ width: CARD_WIDTH, minWidth: CARD_WIDTH }}
+              >
+                <div className="relative aspect-square w-full overflow-hidden bg-gray-50">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    sizes={`${CARD_WIDTH}px`}
+                    className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
+                    priority={realIdx < 3}
+                  />
                 </div>
-              </div>
-            </article>
-          );
-        })}
+
+                <div className="flex flex-col gap-1 p-4 pt-3">
+                  <span className="text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
+                    {product.category}
+                  </span>
+                  <h3 className="line-clamp-2 text-sm leading-snug font-semibold text-gray-900">
+                    {product.name}
+                  </h3>
+                  <h4 className="line-clamp-2 text-xs leading-snug font-semibold text-gray-900">
+                    {product.price}
+                  </h4>
+                  <div className="mt-3 flex items-center justify-between">
+                    <Link
+                      href={`/shop/${product.id}`}
+                      className="group/link flex items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-gray-900"
+                    >
+                      View details
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 12 12"
+                        fill="none"
+                        className="transition-transform duration-200 group-hover/link:translate-x-0.5"
+                      >
+                        <path
+                          d="M2.5 6h7M6.5 3l3 3-3 3"
+                          stroke="currentColor"
+                          strokeWidth="1.4"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Link>
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation(); // prevents triggering any parent click handlers
+                        await fetch("/api/cart", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            itemId: product.id,
+                            quantity: 1,
+                          }),
+                        });
+                      }}
+                      className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-gray-700"
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </div>
 
       {COUNT > 1 && (
