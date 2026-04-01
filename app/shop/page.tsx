@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import ProductGrid from "@/app/ui/shop/product-grid";
 import { bitcount } from "@/app/ui/fonts";
-import Search from "@/app/ui/search";
+import Search from "@/app/ui/shop/search";
 import { Suspense } from "react";
-import { ProductGridSkeleton } from "../ui/skeletons";
+import { ProductGridSkeleton } from "@/app/ui/skeletons";
+import { fetchProductsPages } from "@/app/lib/data";
+import Pagination from "@/app/ui/shop/pagination";
 
 export const metadata: Metadata = {
-  title: "Shop",
+  title: "Store",
   description: "Tech Haven Storefront.",
 };
 
@@ -23,12 +25,14 @@ export default async function Page(props: {
   const sort = searchParams?.sort || "";
   const category = searchParams?.category || "";
   const currentPage = Number(searchParams?.page) || 1;
+  const totalPages = await fetchProductsPages(query, sort, category);
   return (
     <main>
       <h1 className={`mt-30 text-center text-9xl ${bitcount.className}`}>
         Store
       </h1>
       <Search placeholder="Search products" />
+      <Pagination totalPages={totalPages} />
       <Suspense
         key={query + currentPage + sort}
         fallback={<ProductGridSkeleton />}
@@ -40,6 +44,7 @@ export default async function Page(props: {
           currentPage={currentPage}
         />
       </Suspense>
+      <Pagination totalPages={totalPages} />
     </main>
   );
 }

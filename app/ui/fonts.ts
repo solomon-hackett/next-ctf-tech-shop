@@ -4,6 +4,7 @@ export const bitcount = Bitcount({
   subsets: ["latin"],
   weight: ["500"],
   variable: "--font-bitcount",
+  fallback: ["monospace"],
 });
 
 export const oswald = Oswald({
